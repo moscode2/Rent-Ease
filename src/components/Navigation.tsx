@@ -15,7 +15,7 @@ interface NavigationProps {
   onLogout: () => void;
 }
 
-export function Navigation({ userRole, userName = "John Doe", onLogout }: NavigationProps) {
+export function Navigation({ userRole, userName = "User", onLogout }: NavigationProps) {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">

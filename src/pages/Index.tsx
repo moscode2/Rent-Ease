@@ -6,13 +6,46 @@ import { RoleSelector } from "@/components/RoleSelector";
 import { LandlordDashboard } from "@/components/dashboard/LandlordDashboard";
 import { TenantDashboard } from "@/components/dashboard/TenantDashboard";
 import { Navigation } from "@/components/Navigation";
+import { AuthForm } from "@/components/AuthForm";
+import { useAuth } from "@/hooks/useAuth";
 
 type UserRole = 'landlord' | 'tenant' | null;
-type AppState = 'landing' | 'role-selection' | 'dashboard';
+type AppState = 'landing' | 'role-selection' | 'auth' | 'dashboard';
 
 const Index = () => {
+  const { user, profile, loading, signOut, isAuthenticated } = useAuth();
   const [appState, setAppState] = useState<AppState>('landing');
   const [userRole, setUserRole] = useState<UserRole>(null);
+
+  // Show loading spinner while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-4 mx-auto">
+            <Building2 className="w-9 h-9 text-white" />
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated, show dashboard
+  if (isAuthenticated && profile) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation 
+          userRole={profile.role} 
+          userName={`${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'User'}
+          onLogout={signOut} 
+        />
+        <main className="container mx-auto px-4 py-8">
+          {profile.role === 'landlord' ? <LandlordDashboard /> : <TenantDashboard />}
+        </main>
+      </div>
+    );
+  }
 
   const handleGetStarted = () => {
     setAppState('role-selection');
@@ -20,26 +53,21 @@ const Index = () => {
 
   const handleRoleSelect = (role: 'landlord' | 'tenant') => {
     setUserRole(role);
-    setAppState('dashboard');
+    setAppState('auth');
   };
 
-  const handleLogout = () => {
+  const handleBackToRoleSelection = () => {
     setUserRole(null);
+    setAppState('role-selection');
+  };
+
+  const handleBackToLanding = () => {
     setAppState('landing');
   };
 
-  if (appState === 'dashboard' && userRole) {
+  if (appState === 'auth' && userRole) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation 
-          userRole={userRole} 
-          userName="Demo User"
-          onLogout={handleLogout} 
-        />
-        <main className="container mx-auto px-4 py-8">
-          {userRole === 'landlord' ? <LandlordDashboard /> : <TenantDashboard />}
-        </main>
-      </div>
+      <AuthForm userRole={userRole} onBack={handleBackToRoleSelection} />
     );
   }
 
@@ -48,6 +76,14 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-secondary flex items-center justify-center p-4">
         <div className="w-full max-w-6xl">
           <div className="text-center mb-8">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBackToLanding}
+              className="absolute left-4 top-4"
+            >
+              ← Back
+            </Button>
             <div className="inline-flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
                 <Building2 className="w-7 h-7 text-white" />
@@ -93,9 +129,6 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8" onClick={handleGetStarted}>
                 Get Started Free
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8">
-                Watch Demo
               </Button>
             </div>
           </div>
@@ -197,7 +230,7 @@ const Index = () => {
               Join thousands of landlords and tenants who trust RentEase for their rental management needs.
             </p>
             <Button size="lg" className="text-lg px-8" onClick={handleGetStarted}>
-              Start Your Free Trial
+              Get Started Free
             </Button>
           </div>
         </div>
