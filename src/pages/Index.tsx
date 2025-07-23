@@ -128,7 +128,7 @@ const Index = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8" onClick={handleGetStarted}>
-                Get Started Free
+                Get Started
               </Button>
             </div>
           </div>
@@ -230,7 +230,7 @@ const Index = () => {
               Join thousands of landlords and tenants who trust RentEase for their rental management needs.
             </p>
             <Button size="lg" className="text-lg px-8" onClick={handleGetStarted}>
-              Get Started Free
+              Get Started
             </Button>
           </div>
         </div>
